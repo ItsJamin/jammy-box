@@ -2,7 +2,7 @@ import MusicPlayer
 from MusicDownloader import YTMusicDownloader
 
 if __name__ == '__main__':
-    p = MusicPlayer.VisualMusicPlayer("wav_library", [YTMusicDownloader()], 150)
+    p = MusicPlayer.VisualMusicPlayer("wav_library", [YTMusicDownloader()], 150, [])
 
     #p.play_song("youtu.be/dQw4w9WgXcQ") #rick
     #p.play_song("youtu.be/h4UqMyldS7Q")

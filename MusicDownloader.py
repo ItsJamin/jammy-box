@@ -1,7 +1,6 @@
 import os
 import yt_dlp
 
-
 #-- Class for Downloading and Handling Music in a specific Location --"
 class MusicDownloader():
      
@@ -58,7 +57,6 @@ class YTMusicDownloader(MusicDownloader):
      def extract_music_id(self, url):
         if 'watch?v=' in url:
             video_id = url.split('watch?v=')[1]
-
         elif 'youtu.be/' in url:
                 video_id = url.split('/')[-1]
         else:

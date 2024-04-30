@@ -70,11 +70,14 @@ class VisualMusicPlayer(MusicPlayer):
 
           # Virtual LED Window
           pygame.mixer.pre_init(frequency=sample_rate)
+          pygame.mixer.init()
           pygame.mixer.music.load(song_path)
           pygame.mixer.music.play()
-          
+
+          self.running = True
 
           while pygame.mixer.music.get_busy() and self.running:
+
                last_pos = 0
                try:
                     last_pos = position
@@ -90,8 +93,6 @@ class VisualMusicPlayer(MusicPlayer):
 
                fft_data = np.fft.fft(audio_data[start_int:end_int])
                magnitude_data = np.abs(fft_data)/max_magnitude
-
-               
           
 
           pygame.quit()
