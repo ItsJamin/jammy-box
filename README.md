@@ -20,7 +20,7 @@ Proper assets to control and power your Raspberry Pi (if you already have assets
 - HDMI Cable
 - HDMI to Micro HDMI Adapter (GOOBAY 68842)
 - Heat Sinks for Raspberry (RPI COOL 4XSI)
-- Micro-SD-Karte (LMEX1L064GG2)
+- Micro-SD-Card (LMEX1L064GG2)
 - Display with HDMI-Port
 - Mouse
 - Keyboard
