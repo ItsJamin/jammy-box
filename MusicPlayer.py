@@ -4,6 +4,9 @@ import time
 import scipy.io.wavfile
 import numpy as np
 
+import board
+import neopixel
+
 from PartVisualizer import PartVisualizer
 from MusicDownloader import MusicDownloader
 
@@ -45,57 +48,102 @@ class MusicPlayer():
 #-- This Class expands the functionality by creating light effects for music --#
 class VisualMusicPlayer(MusicPlayer):
     
-    def __init__(self, path, downloader_list : list[MusicDownloader], led_count : int,
-                  visualizer_list : list[PartVisualizer]):
+    def __init__(self, path, downloader_list : list[MusicDownloader],
+                 led_strip : neopixel.NeoPixel, led_count : int,
+                 visualizer_list : list[PartVisualizer]):
           super().__init__(path, downloader_list)
-
+          
+          self.led_strip = led_strip
           self.led_count = led_count
           self.visualizer_list = visualizer_list
-          self.part_length = 400 #this variable describes how big the fft-intervall of data in a given moment is
+          self.part_length = 100 #this variable describes how big the fft-intervall of data in a given moment is
 
 
     def play_song(self, url):
+        
+        self.led_strip.fill((0, 0, 0))
+        self.led_strip.show()
+        
 
-          song_path = self.get_song(url)
-          sample_rate, audio_data = scipy.io.wavfile.read(song_path)
+        song_path = self.get_song(url)
+        sample_rate, audio_data = scipy.io.wavfile.read(song_path)
 
-          # get the frequency information about the wav file
-          fft_data_all = np.fft.fft(audio_data)
-          magnitude_all = np.abs(fft_data_all)
-          frequencies_all = np.fft.fftfreq(len(audio_data), 1/sample_rate)
+        # get the frequency information about the wav file
+        fft_data_all = np.fft.fft(audio_data)
+        magnitude_all = np.abs(fft_data_all)
+        frequencies_all = np.fft.fftfreq(len(audio_data), 1/sample_rate)
+        
+        audio_length = len(audio_data)/sample_rate
 
-          audio_length = len(audio_data)/sample_rate
+        max_magnitude = np.max(magnitude_all)
 
-          max_magnitude = np.max(magnitude_all)
+        # Virtual LED Window
+        pygame.mixer.pre_init(frequency=sample_rate)
+        pygame.mixer.init()
+        pygame.mixer.music.load(song_path)
+        pygame.mixer.music.play()
 
-          # Virtual LED Window
-          pygame.mixer.pre_init(frequency=sample_rate)
-          pygame.mixer.init()
-          pygame.mixer.music.load(song_path)
-          pygame.mixer.music.play()
-
-          self.running = True
-
-          while pygame.mixer.music.get_busy() and self.running:
-
-               last_pos = 0
-               try:
-                    last_pos = position
-               except:
-                    pass
-               position = pygame.mixer.music.get_pos() / 1000
-
-               i = int(position * sample_rate) #Calculate which wav-data to use
-               passed = position / audio_length
-
-               start_int = int(max(0,i-self.part_length))
-               end_int = int(min(i+self.part_length,audio_length*sample_rate))
-
-               fft_data = np.fft.fft(audio_data[start_int:end_int])
-               magnitude_data = np.abs(fft_data)/max_magnitude
+        self.running = True
           
+        while pygame.mixer.music.get_busy() and self.running:
+            last_pos = 0
+            try:
+                last_pos = position
+            except:
+                pass
+            position = pygame.mixer.music.get_pos() / 1000
+           
+            #print(f"\rPlaying... {round(position, 1)}",end="")
 
-          pygame.quit()
+            i = int(position * sample_rate) #Calculate which wav-data to use
+            passed = position / audio_length
+            
+            led_delay = 0 * sample_rate
+
+            start_int = int(max(0,i-self.part_length+led_delay))
+            end_int = int(min(i+self.part_length+led_delay,audio_length*sample_rate))
+
+            fft_data = np.fft.fft(audio_data[start_int:end_int])
+            magnitude_data = np.abs(fft_data)/max_magnitude
+           
+            for visualizer in self.visualizer_list:
+                color_line = visualizer.do_stuff(passed, fft_data, magnitude_data, audio_data)
+                
+                for i in range(len(color_line)-1, -1, -1):
+                    #if color_line[i] != (0,0,0):
+                    self.led_strip[visualizer.section_pos+i] = color_line[i]
+                self.led_strip.show()
+                    
+            
+            
+            #loud = []
+            #freq = []
+            #w_freq = 0
+            #fft_len = 0
+            
+            #for elem in magnitude_data:
+            #    freq.append(elem[0])
+            #    loud.append(elem[1])
+            #    w_freq += elem[0]*elem[1]
+            #    fft_len += 1
+            
+            #a_loud = np.sum(loud) / fft_len
+            #a_freq = w_freq / fft_len
+            #max_loud_ind = np.argmax(loud)
+            #max_loud_freq = freq[max_loud_ind]
+            
+            
+            #if a_loud > 0.05:
+            #    self.led_strip.fill((a_freq*255,255*(1-a_freq),128-(a_freq/2))) #passed*255,max_loud_freq/np.max(frequencies_all)
+            #else:
+            #    self.led_strip.fill((0, 0, 0)) 
+            
+            
+        
+        
+        self.led_strip.fill((0, 0, 0))
+        self.led_strip.show()
+        pygame.quit()
 
 
 #-- Old and Testing Functions for a Visual Music Player --#

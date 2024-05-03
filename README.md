@@ -37,3 +37,21 @@ For adding the heat sinks look [here](https://www.youtube.com/watch?v=WMIniPIvYj
 
 ### Setting Up Project
 
+Clone the Project
+
+`git clone https://github.com/ItsJamin/jammy-box`
+
+
+Install reqiurements.txt
+
+`cd jammy-box`
+`pip3 install -r requirements.txt`
+
+Essentially you will need:
+- pygame (for running the audio)
+- scipy (for analyzing wav files)
+- yt-dlp (for downloading Music from YouTube)
+And these 3 Commands for controlling LED:
+```sudo pip3 install rpi_ws281x
+sudo pip3 install adafruit-circuitpython-neopixel
+sudo python3 -m pip install --force-reinstall adafruit-blinka```
