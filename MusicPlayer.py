@@ -98,10 +98,10 @@ class VisualMusicPlayer(MusicPlayer):
             i = int(position * sample_rate) #Calculate which wav-data to use
             passed = position / audio_length
             
-            led_delay = 0 * sample_rate
+            #led_delay = 0 * sample_rate
 
-            start_int = int(max(0,i-self.part_length+led_delay))
-            end_int = int(min(i+self.part_length+led_delay,audio_length*sample_rate))
+            start_int = int(max(0,i-self.part_length))
+            end_int = int(min(i+self.part_length,audio_length*sample_rate))
 
             fft_data = np.fft.fft(audio_data[start_int:end_int])
             magnitude_data = np.abs(fft_data)/max_magnitude
